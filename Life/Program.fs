@@ -58,12 +58,12 @@ let main argv =
 
     let initialData = [(1, 1); (1, 2); (1, 3)]
 
-    let createTimer interval timeout =
+    let createTimer interval =
         let timer = new System.Windows.Forms.Timer(Interval = int(interval * 1000.0), Enabled = true)
         timer.Start()
         timer.Tick
     
-    let events = createTimer 1.0 10
+    let events = createTimer 1.0
     let eventStream = events |> Observable.scan (fun data _ -> doIteration data) initialData
     let chart = LiveChart.FastPoint(eventStream, Name = "Life").WithXAxis(Enabled = false).WithYAxis(Enabled = false)
     let form = chart.ShowChart()

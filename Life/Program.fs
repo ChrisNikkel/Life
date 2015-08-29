@@ -12,7 +12,7 @@ let main argv =
         [for i in -1..1 -> [for j in -1..1 -> (i, j) ] ] 
         |> List.concat
 
-    //use collect instead of this
+    //TODO: use collect instead of this
     let findSurrounding d = 
         surrounding 
         |> List.map(fun cell -> combine(d, cell)) 

@@ -12,7 +12,7 @@ let main argv =
         [for i in -1..1 -> [for j in -1..1 -> (i, j) ] ] 
         |> List.concat
 
-//use collect instead of this
+    //use collect instead of this
     let findSurrounding d = 
         surrounding 
         |> List.map(fun cell -> combine(d, cell)) 
@@ -54,18 +54,43 @@ let main argv =
         else
             sortAndRemoveDuplicates newData 
 
-    let data1 = [(1, 1); (1, 2); (1, 3)]   
-     
-    let data2 = iterateAliveGeneration data1 [] 0
+    let initialData = [(1, 1); (1, 2); (1, 3)]   
     
+    let createTimerAndObservable timerInterval =
+        // setup a timer
+        let timer = new System.Timers.Timer(float timerInterval)
+        timer.AutoReset <- true
 
-    let chart1 = data1 |> Chart.FastPoint
-    let chart2 = data2 |> Chart.FastPoint
-    
-    let chart = [chart1; chart2] |> Chart.Combine |> Chart.WithXAxis(Enabled=false) |> Chart.WithYAxis(Enabled=false)
-    
-    let form = chart.ShowChart()
+        // events are automatically IObservable
+        let observable = timer.Elapsed  
 
-    System.Windows.Forms.Application.Run(form)
+        // return an async task
+        let task = async {
+            timer.Start()
+            do! Async.Sleep 5000
+            timer.Stop()
+            }
+
+        // return a async task and the observable
+        (task,observable)
+
+    // create the timer and the corresponding observable
+    let timerCount2, timerEventStream = createTimerAndObservable 500
+
+    let showData (data: (int * int) list) = 
+        let chart = data |> Chart.FastPoint |> Chart.WithXAxis(Enabled=false) |> Chart.WithYAxis(Enabled=false)
+        let form = chart.ShowChart() 
+        System.Windows.Forms.Application.Run(form)
+
+    // set up the transformations on the event stream
+    timerEventStream 
+    |> Observable.scan (fun data _ ->  (iterateAliveGeneration data [] 0)) initialData
+    |> Observable.subscribe (fun data -> showData data)
+    |> ignore
+
+    // run the task now
+    Async.RunSynchronously timerCount2
+
+    showData initialData
 
     0 // return an integer exit code

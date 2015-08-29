@@ -64,16 +64,17 @@ let main argv =
     let blockItem = [(1, 1); (1, 2); (2, 1); (2, 2); ]
 
     let initialData = 
-        crossItem
-        |> addItem (gliderItem |> setItemPosition 10 100)
+        blockItem
+        |> addItem (gliderItem |> setItemPosition 10 85)
         |> addItem (crossItem |> setItemPosition 20 50)
+        |> addItem (toadItem |> setItemPosition 50 50)
 
     let createTimer interval =
         let timer = new System.Windows.Forms.Timer(Interval = int(interval * 1000.0), Enabled = true)
         timer.Start()
         timer.Tick
     
-    let events = createTimer 0.25
+    let events = createTimer 0.1
     let eventStream = events |> Observable.scan (fun data _ -> doIteration data) initialData
     let chart = LiveChart.Point(eventStream, Name = "Life").WithXAxis(Enabled = false, Min = 0.0, Max = 100.0).WithYAxis(Enabled = false, Min = 1.0, Max = 100.0)
     let form = chart.ShowChart()

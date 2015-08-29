@@ -53,44 +53,19 @@ let main argv =
                 |> List.append (iterateAliveGeneration previousData (newAliveData) (cellIndex + 1))
         else
             sortAndRemoveDuplicates newData 
-
-    let initialData = [(1, 1); (1, 2); (1, 3)]   
     
-    let createTimerAndObservable timerInterval =
-        // setup a timer
-        let timer = new System.Timers.Timer(float timerInterval)
-        timer.AutoReset <- true
+    let doIteration initialData = (iterateAliveGeneration initialData [] 0)
 
-        // events are automatically IObservable
-        let observable = timer.Elapsed  
+    let initialData = [(1, 1); (1, 2); (1, 3)]
 
-        // return an async task
-        let task = async {
-            timer.Start()
-            do! Async.Sleep 5000
-            timer.Stop()
-            }
-
-        // return a async task and the observable
-        (task,observable)
-
-    // create the timer and the corresponding observable
-    let timerCount2, timerEventStream = createTimerAndObservable 500
-
-    let showData (data: (int * int) list) = 
-        let chart = data |> Chart.FastPoint |> Chart.WithXAxis(Enabled=false) |> Chart.WithYAxis(Enabled=false)
-        let form = chart.ShowChart() 
-        System.Windows.Forms.Application.Run(form)
-
-    // set up the transformations on the event stream
-    timerEventStream 
-    |> Observable.scan (fun data _ ->  (iterateAliveGeneration data [] 0)) initialData
-    |> Observable.subscribe (fun data -> showData data)
-    |> ignore
-
-    // run the task now
-    Async.RunSynchronously timerCount2
-
-    showData initialData
-
+    let createTimer interval timeout =
+        let timer = new System.Windows.Forms.Timer(Interval = int(interval * 1000.0), Enabled = true)
+        timer.Start()
+        timer.Tick
+    
+    let events = createTimer 1.0 10
+    let eventStream = events |> Observable.scan (fun data _ -> doIteration data) initialData
+    let chart = LiveChart.FastPoint(eventStream, Name = "Life").WithXAxis(Enabled = false).WithYAxis(Enabled = false)
+    let form = chart.ShowChart()
+    System.Windows.Forms.Application.Run(form)
     0 // return an integer exit code

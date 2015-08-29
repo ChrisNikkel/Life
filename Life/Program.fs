@@ -56,16 +56,27 @@ let main argv =
 
     let doIteration initialData = (iterateAliveGeneration initialData [] 0)
 
-    let initialData = [(1, 1); (1, 2); (1, 3); (10, 1); (10, 2); (10, 3); (1, 11); (1, 12); (1, 13)]
+    let setItemPosition x y item = item |> List.map (fun (ix, iy) -> (ix + x, iy + y))
+    let addItem = List.append
+    let crossItem = [(1, 1); (1, 2); (1, 3)]
+    let gliderItem = [(1, 1); (2, 1); (3, 1); (3, 2); (2, 3)]
+
+    let initialData = 
+        crossItem
+        |> addItem (gliderItem |> setItemPosition 10 100)
+        |> addItem (crossItem |> setItemPosition 20 50)
 
     let createTimer interval =
         let timer = new System.Windows.Forms.Timer(Interval = int(interval * 1000.0), Enabled = true)
         timer.Start()
         timer.Tick
     
-    let events = createTimer 1.0
+    let events = createTimer 0.25
     let eventStream = events |> Observable.scan (fun data _ -> doIteration data) initialData
-    let chart = LiveChart.FastPoint(eventStream, Name = "Life").WithXAxis(Enabled = false, Min = 1.0, Max = 100.0).WithYAxis(Enabled = false, Min = 1.0, Max = 100.0)
+    let chart = LiveChart.Point(eventStream, Name = "Life").WithXAxis(Enabled = false, Min = 0.0, Max = 100.0).WithYAxis(Enabled = false, Min = 1.0, Max = 100.0)
     let form = chart.ShowChart()
+    form.Width <- 800
+    form.Height <- 800
+
     System.Windows.Forms.Application.Run(form)
     0 // return an integer exit code

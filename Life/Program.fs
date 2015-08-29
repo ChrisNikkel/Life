@@ -60,6 +60,8 @@ let main argv =
     let addItem = List.append
     let crossItem = [(1, 1); (1, 2); (1, 3)]
     let gliderItem = [(1, 1); (2, 1); (3, 1); (3, 2); (2, 3)]
+    let toadItem = [(1, 1); (2, 1); (3, 1); (2, 2); (3, 2); (4, 2);]
+    let blockItem = [(1, 1); (1, 2); (2, 1); (2, 2); ]
 
     let initialData = 
         crossItem

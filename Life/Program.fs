@@ -36,10 +36,10 @@ let main argv =
 
     let born neighborCount = if neighborCount = 3 then true else false
 
-    let iterateDeadGeneration previousData deadCells = 
+    let iterateDeadGeneration previousData deadCells =
         deadCells |> List.filter(fun deadCell -> born (countNeighbors previousData deadCell))
 
-    let sortAndRemoveDuplicates data = List.ofSeq (set data)      
+    let removeDups data = data |> Set.ofList |> Set.toList
 
     let rec iterateAliveGeneration previousData newData cellIndex =
         if cellIndex < List.length previousData then
@@ -47,13 +47,13 @@ let main argv =
             let (aliveNeighbors, deadNeighbors) = categorizeNeighbors previousData aliveCell
             let newAliveData = 
                 if survives (List.length aliveNeighbors)
-                then aliveCell :: newData
+                then aliveCell :: newData |> removeDups
                 else newData
             iterateDeadGeneration previousData deadNeighbors 
-                |> List.append (iterateAliveGeneration previousData (newAliveData) (cellIndex + 1))
+                |> List.append (iterateAliveGeneration previousData (newAliveData) (cellIndex + 1)) |> removeDups
         else
-            sortAndRemoveDuplicates newData 
-    
+            newData 
+
     let doIteration initialData = (iterateAliveGeneration initialData [] 0)
 
     let initialData = [(1, 1); (1, 2); (1, 3); (10, 1); (10, 2); (10, 3); (1, 11); (1, 12); (1, 13)]

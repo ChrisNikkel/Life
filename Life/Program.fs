@@ -56,7 +56,7 @@ let main argv =
     
     let doIteration initialData = (iterateAliveGeneration initialData [] 0)
 
-    let initialData = [(1, 1); (1, 2); (1, 3)]
+    let initialData = [(1, 1); (1, 2); (1, 3); (10, 1); (10, 2); (10, 3); (1, 11); (1, 12); (1, 13)]
 
     let createTimer interval =
         let timer = new System.Windows.Forms.Timer(Interval = int(interval * 1000.0), Enabled = true)
@@ -65,7 +65,7 @@ let main argv =
     
     let events = createTimer 1.0
     let eventStream = events |> Observable.scan (fun data _ -> doIteration data) initialData
-    let chart = LiveChart.FastPoint(eventStream, Name = "Life").WithXAxis(Enabled = false).WithYAxis(Enabled = false)
+    let chart = LiveChart.FastPoint(eventStream, Name = "Life").WithXAxis(Enabled = false, Min = 1.0, Max = 100.0).WithYAxis(Enabled = false, Min = 1.0, Max = 100.0)
     let form = chart.ShowChart()
     System.Windows.Forms.Application.Run(form)
     0 // return an integer exit code

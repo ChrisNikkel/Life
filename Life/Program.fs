@@ -69,6 +69,10 @@ let main argv =
         |> addItem (gliderItem |> setItemPosition 10 85)
         |> addItem (crossItem |> setItemPosition 20 50)
         |> addItem (toadItem |> setItemPosition 50 50)
+        |> addItem (blockItem |> setItemPosition 40 35)
+        |> addItem (beaconItem |> setItemPosition 10 60)
+        |> removeDups
+
 
     let createTimer interval =
         let timer = new System.Windows.Forms.Timer(Interval = int(interval * 1000.0), Enabled = true)
@@ -77,7 +81,7 @@ let main argv =
     
     let events = createTimer 0.1
     let eventStream = events |> Observable.scan (fun data _ -> doIteration data) initialData
-    let chart = LiveChart.Point(eventStream, Name = "Life").WithXAxis(Enabled = false, Min = 0.0, Max = 100.0).WithYAxis(Enabled = false, Min = 1.0, Max = 100.0)
+    let chart = LiveChart.Point(eventStream, Name = "Life").WithXAxis(Enabled = false, Min = 0.0, Max = 100.0).WithYAxis(Enabled = false, Min = 0.0, Max = 100.0)
     let form = chart.ShowChart()
     form.Width <- 800
     form.Height <- 800

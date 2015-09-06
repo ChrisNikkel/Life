@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>303c83b5-23eb-4c36-a2e9-647e24658217</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>Life</RootNamespace>
     <AssemblyName>Life</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>

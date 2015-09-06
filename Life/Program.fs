@@ -57,7 +57,7 @@ let main argv =
     let doIteration initialData = (iterateAliveGeneration initialData [] 0)
 
     let setItemPosition x y item = item |> List.map (fun (ix, iy) -> (ix + x, iy + y))
-    let addItem = List.append
+    let addItem item x y map = map |> List.append (item |> setItemPosition x y)
     let crossItem = [(1, 1); (1, 2); (1, 3)]
     let gliderItem = [(1, 1); (2, 1); (3, 1); (3, 2); (2, 3)]
     let toadItem = [(1, 1); (2, 1); (3, 1); (2, 2); (3, 2); (4, 2)]
@@ -65,13 +65,12 @@ let main argv =
     let beaconItem = [(4, 1); (4, 2); (3, 1); (1, 3); (1, 4); (2, 4)]
 
     let initialData = 
-        blockItem
-        |> addItem (gliderItem |> setItemPosition 10 85)
-        |> addItem (crossItem |> setItemPosition 20 50)
-        |> addItem (toadItem |> setItemPosition 50 50)
-        |> addItem (blockItem |> setItemPosition 40 35)
-        |> addItem (beaconItem |> setItemPosition 10 60)
-        |> removeDups
+        blockItem |> setItemPosition 25 46
+        |> addItem gliderItem 5 65 |> addItem gliderItem 25 52 |> addItem gliderItem 25 65
+        |> addItem gliderItem 5 52 |> addItem crossItem 20 50 |> addItem toadItem 50 50
+        |> addItem gliderItem 22 22 |> addItem crossItem 44 11 |> addItem toadItem 23 55
+        |> addItem blockItem 50 35 |> addItem beaconItem 70 60 |> addItem beaconItem 30 30
+        |> addItem beaconItem 10 60 |> addItem beaconItem 30 10 |> removeDups
 
 
     let createTimer interval =
@@ -79,9 +78,9 @@ let main argv =
         timer.Start()
         timer.Tick
     
-    let events = createTimer 0.1
+    let events = createTimer 0.25
     let eventStream = events |> Observable.scan (fun data _ -> doIteration data) initialData
-    let chart = LiveChart.Point(eventStream, Name = "Life").WithXAxis(Enabled = false, Min = 0.0, Max = 100.0).WithYAxis(Enabled = false, Min = 0.0, Max = 100.0)
+    let chart = LiveChart.FastPoint(eventStream, Name = "Life").WithXAxis(Enabled = false, Min = 0.0, Max = 100.0).WithYAxis(Enabled = false, Min = 0.0, Max = 100.0)
     let form = chart.ShowChart()
     form.Width <- 800
     form.Height <- 800
